@@ -10,7 +10,7 @@ const getJobs = async (req, res) => {
 };
 
 const addJob = async (req, res) => {
-    const { title, description, company, location, salary } = req.body;
+    const { title, description, company, location, salary, deadline, completed } = req.body;
     try {
         const job = await JobPost.create({
             userId: req.user.id,
@@ -29,7 +29,7 @@ const addJob = async (req, res) => {
 };
 
 const updateJob = async (req, res) => {
-    const { title, description, company, location, salary } = req.body;
+    const { title, description, company, location, salary, deadline, completed } = req.body;
     try {
         const job = await JobPost.findById (req.params.id);
         if (!job) return res.status(404).json({ message: 'Job not found'});
