@@ -18,7 +18,9 @@ const addJob = async (req, res) => {
             description,
             company,
             location,
-            salary
+            salary,
+            deadline,
+            completed
         });
         res.status(201).json(job);
     } catch (error) {
@@ -37,6 +39,8 @@ const updateJob = async (req, res) => {
         job.company = company || job.company;
         job.location = location || job.location;
         job.salary = salary ?? job.salary;
+        job.deadline= deadline || job.deadline;
+        job.completed = completed ?? job.completed;
 
         const updatedJob = await job.save();
         res.json(updatedJob);
