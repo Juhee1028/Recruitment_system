@@ -23,7 +23,7 @@ const JobList = ({ jobs, setJobs, setEditingJob }) => {
           <p>{job.description}</p>
           <p className="text-sm text-gray-500">Company: { job.company || 'N/A' }</p>
           <p className="text-sm text-gray-500">Location: { job.location || 'N/A' }</p>
-          <p className="text-sm text-gray-500">Salary: { job.salary ? '$${job.salary}': 'N/A' }</p>
+          <p className="text-sm text-gray-500">Salary: { job.salary ? `$${job.salary}`: 'N/A' }</p>
           <p className="text-sm text-gray-500">Deadline: { job.deadline ? new Date(job.deadline).toLocaleDateString() : 'N/A' }</p>
           <div className="mt-2">
             <button
