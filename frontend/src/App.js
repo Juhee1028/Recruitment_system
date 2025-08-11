@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import JobPage from './pages/JobPage';
 
+
 function App() {
   return (
     <Router>
@@ -20,3 +21,5 @@ function App() {
 }
 
 export default App;
+
+
