@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import JobPage from './pages/JobPage';
+import AssessmentQAPage from './pages/AssessmentQAPage';
 
 
 function App() {
