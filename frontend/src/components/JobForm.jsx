@@ -42,6 +42,7 @@ const JobForm = ({ jobs, setJobs, editingJob, setEditingJob }) => {
     }
   };
 
+  
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 shadow-md rounded mb-6">
       <h1 className="text-2xl font-bold mb-4">{editingJob ? 'Edit Job' : 'Create Job'}</h1>
@@ -94,3 +95,4 @@ const JobForm = ({ jobs, setJobs, editingJob, setEditingJob }) => {
 };
 
 export default JobForm;
+
