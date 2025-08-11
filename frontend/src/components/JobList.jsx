@@ -15,6 +15,7 @@ const JobList = ({ jobs, setJobs, setEditingJob }) => {
     }
   };
 
+
   return (
     <div>
       {jobs.map((job) => (
@@ -46,3 +47,4 @@ const JobList = ({ jobs, setJobs, setEditingJob }) => {
 };
 
 export default JobList;
+

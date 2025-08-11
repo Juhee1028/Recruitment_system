@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+
 const JobPostSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     title: { type: String, required: true },
@@ -11,6 +12,5 @@ const JobPostSchema = new mongoose.Schema({
     completed: { type: Boolean, default: false }
 });
 
+
 module.exports = mongoose.model('Job', JobPostSchema);
-
-

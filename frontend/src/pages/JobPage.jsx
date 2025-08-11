@@ -9,6 +9,7 @@ const JobPage = () => {
   const [jobs, setJobs] = useState([]);
   const [editingJob, setEditingJob] = useState(null);
 
+
   useEffect(() => {
     const fetchJobs = async () => {
       try {
@@ -38,3 +39,5 @@ const JobPage = () => {
 };
 
 export default JobPage;
+
+
