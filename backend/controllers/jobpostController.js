@@ -1,8 +1,6 @@
 const JobPost = require('../models/JobPost');
 
-// Read job posting
 
-// read job posting
 const getJobs = async (req, res) => {
     try {
         const jobs = await JobPost.find({userId: req.user.id});
@@ -11,6 +9,7 @@ const getJobs = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
 
 const addJob = async (req, res) => {
     const { title, description, company, location, salary, deadline, completed } = req.body;
