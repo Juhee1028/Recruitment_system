@@ -1,5 +1,7 @@
 const JobPost = require('../models/JobPost');
 
+// Read job posting
+
 const getJobs = async (req, res) => {
     try {
         const jobs = await JobPost.find({userId: req.user.id});
@@ -9,6 +11,7 @@ const getJobs = async (req, res) => {
     }
 };
 
+// Create job posting
 const addJob = async (req, res) => {
     const { title, description, company, location, salary, deadline, completed } = req.body;
     try {
@@ -28,6 +31,7 @@ const addJob = async (req, res) => {
     }
 };
 
+// Update job posting
 const updateJob = async (req, res) => {
     const { title, description, company, location, salary, deadline, completed } = req.body;
     try {
@@ -49,6 +53,7 @@ const updateJob = async (req, res) => {
     }
 };
 
+// Delete job posting
 const deleteJob = async (req, res) => {
     try {
         const job = await JobPost.findById(req.params.id);
@@ -62,3 +67,4 @@ const deleteJob = async (req, res) => {
 };
 
 module.exports = { getJobs, addJob, updateJob, deleteJob };
+
