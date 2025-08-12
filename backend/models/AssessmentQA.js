@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 
 const assessmentQASchema = new mongoose.Schema({
     jobId: { type: mongoose.Schema.Types.ObjectId, ref: 'JobPost', required: true },
-    questionText: { type: String, required: true },
-    correctAnswer: { type: String, required: false },
+    questionText: { type: String },
+    correctAnswer: { type: String },
     timeLimit: { type: Number, default: 0},
 });
 
