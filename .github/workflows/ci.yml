@@ -40,9 +40,10 @@ jobs:
         echo "Secret 2 is: $JWT_SECRET"
         echo "Secret 3 is: $PORT"
       
-      # there wer no PM2 processes running in my enviornment
+      # there were no PM2 processes running in my enviornment 
     - name: Stop PM2 processes 
       run: pm2 stop all
+
 
 
     # Install dependencies for backend
