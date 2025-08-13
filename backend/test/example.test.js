@@ -301,7 +301,7 @@ describe('UpdateQuestion Functionality Test', () => {
 
     await updateQuestion(req, res);
 
-    expect(existingQuestion.questionText).to.equal("Udated Question");
+    expect(existingQuestion.questionText).to.equal("Updated Question");
     expect(existingQuestion.correctAnswer).to.equal("Updated Answer");
     expect(existingQuestion.timeLimit).to.equal(60);
     expect(res.json.calledOnce).to.be.true;
