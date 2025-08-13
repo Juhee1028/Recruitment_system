@@ -3,11 +3,13 @@ import axiosInstance from '../axiosConfig';
 import JobForm from '../components/JobForm';
 import JobList from '../components/JobList';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const JobPage = () => {
   const { user } = useAuth();
   const [jobs, setJobs] = useState([]);
   const [editingJob, setEditingJob] = useState(null);
+  const navigate = useNavigate();
 
 
   useEffect(() => {
@@ -33,7 +35,7 @@ const JobPage = () => {
         editingJob={editingJob}
         setEditingJob={setEditingJob}
       />
-      <JobList jobs={jobs} setJobs={setJobs} setEditingJob={setEditingJob} />
+      <JobList jobs={jobs} setJobs={setJobs} setEditingJob={setEditingJob} navigate = {navigate} />
     </div>
   );
 };

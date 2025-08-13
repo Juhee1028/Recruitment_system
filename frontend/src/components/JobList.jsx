@@ -1,7 +1,7 @@
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 
-const JobList = ({ jobs, setJobs, setEditingJob }) => {
+const JobList = ({ jobs, setJobs, setEditingJob, navigate }) => {
   const { user } = useAuth();
 
   const handleDelete = async (jobId) => {
@@ -15,6 +15,9 @@ const JobList = ({ jobs, setJobs, setEditingJob }) => {
     }
   };
 
+  const goToAssessment = (jobId) => {
+    navigate(`/assessment-questions/${jobId}`);
+  };
 
   return (
     <div>
@@ -35,9 +38,15 @@ const JobList = ({ jobs, setJobs, setEditingJob }) => {
             </button>
             <button
               onClick={() => handleDelete(job._id)}
-              className="bg-red-500 text-white px-4 py-2 rounded"
+              className="mr-2 bg-red-500 text-white px-4 py-2 rounded"
             >
               Delete
+            </button>
+            <button
+              onClick ={() => goToAssessment(job._id)}
+              className="bg-green-600 text-white px-4 py-2 rounded"
+            >
+              Manage Assessment
             </button>
           </div>
         </div>

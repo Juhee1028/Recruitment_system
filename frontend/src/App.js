@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import JobPage from './pages/JobPage';
+import AssessmentQAPage from './pages/AssessmentQAPage';
 
 
 function App() {
@@ -15,10 +16,12 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/jobs" element={<JobPage />} />
+        <Route path="/assessment-questions/:jobId" element={<AssessmentQAPage />} />
       </Routes>
     </Router>
   );
 }
+
 
 export default App;
 

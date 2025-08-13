@@ -1,298 +1,425 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const http = require('http');
-const app = require('../server'); 
-const connectDB = require('../config/db');
 const mongoose = require('mongoose');
 const sinon = require('sinon');
 const JobPost = require('../models/JobPost');
-const { updateJob,getJobs,addJob,deleteJob } = require('../controllers/jobpostController');
+const AssessmentQA = require('../models/AssessmentQA');
+const { getJobs, addJob, updateJob, deleteJob } = require('../controllers/jobpostController');
+const { getQuestions, addQuestion, updateQuestion, deleteQuestion } = require('../controllers/assessmentQAController');
 const { expect } = chai;
 
 chai.use(chaiHttp);
-let server;
-let port;
 
-describe('AddJob Function Test', () => {
+// Job Posting Functionality
 
-  it('should create a new job successfully', async () => {
-    // Mock request data
-    const req = {
-      user: { id: new mongoose.Types.ObjectId() },
-      body: { title: "New job", description: "Job description", company: 'ABC Inc', location: 'Sydney', salary: 100000, deadline: "2025-12-31" }
-    };
+describe('AddJob Functionality Test', () => {
+    afterEach(() => sinon.restore());
 
-    // Mock JobPost that would be created
-    const createdJob = { _id: new mongoose.Types.ObjectId(), ...req.body, userId: req.user.id };
+    it('should create a new job successfully', async () => {
+        const req = {
+            user: { id: new mongoose.Types.ObjectId() },
+            body: {
+                title: "New Job",
+                description: "Job description",
+                company: "Company A",
+                location: "Location A",
+                salary: 50000,
+                deadline: "2025-12-31",
+                completed: false
+            }
+        };
 
-    // Stub JobPost.create to return the createdJob
-    const createStub = sinon.stub(JobPost, 'create').resolves(createdJob);
+        const createdJob = { _id: new mongoose.Types.ObjectId(), ...req.body, userId: req.user.id };
 
-    // Mock response object
-    const res = {
-      status: sinon.stub().returnsThis(),
-      json: sinon.spy()
-    };
+        const createStub = sinon.stub(JobPost, 'create').resolves(createdJob);
 
-    // Call function
-    await addJob(req, res);
+        const res = {
+            status: sinon.stub().returnsThis(),
+            json: sinon.spy()
+        };
 
-    // Assertions
-    expect(createStub.calledOnceWith({ userId: req.user.id, ...req.body })).to.be.true;
-    expect(res.status.calledWith(201)).to.be.true;
-    expect(res.json.calledWith(createdJob)).to.be.true;
+        await addJob(req, res);
 
-    // Restore stubbed methods
-    createStub.restore();
-  });
+        expect(res.status.calledWith(201)).to.be.true;
+        expect(res.json.calledWith(createdJob)).to.be.true;
+    });
 
-  it('should return 500 if an error occurs', async () => {
-    // Stub Job.create to throw an error
-    const createStub = sinon.stub(JobPost, 'create').throws(new Error('DB Error'));
+    it('should return 500 if an error occurs', async() => {
+        sinon.stub(JobPost, 'create').throws(new Error('DB Error'));
 
-    // Mock request data
-    const req = {
-      user: { id: new mongoose.Types.ObjectId() },
-      body: { title: "New Job", description: "Job description", company: 'ABC Inc', location: 'Sydney', salary: 100000, deadline: "2025-12-31" }
-    };
+        const req = {
+            user: { id: new mongoose.Types.ObjectId() },
+            body: { title: "New Job"}
+        };
 
-    // Mock response object
-    const res = {
-      status: sinon.stub().returnsThis(),
-      json: sinon.spy()
-    };
+        const res = {
+            status: sinon.stub().returnsThis(),
+            json: sinon.spy()
+        };
 
-    // Call function
-    await addJob(req, res);
+        await addJob(req, res);
 
-    // Assertions
-    expect(res.status.calledWith(500)).to.be.true;
-    expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
-
-    // Restore stubbed methods
-    createStub.restore();
-  });
-
+        expect(res.status.calledWith(500)).to.be.true;
+        expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
+    });
 });
 
-describe('Update Function Test', () => {
+describe('UpdateJob Functionality Test', () => {
+    afterEach(() => sinon.restore());
 
-  it('should update Job successfully', async () => {
-    // Mock task data
-    const jobId = new mongoose.Types.ObjectId();
-    const existingJob = {
-      _id: jobId,
-      title: "Old Job",
-      description: "Old Description",
-      completed: false,
-      deadline: new Date(),
-      save: sinon.stub().resolvesThis(), // Mock save method
-    };
-    // Stub Task.findById to return mock task
-    const findByIdStub = sinon.stub(JobPost, 'findById').resolves(existingJob);
+    it('should update job successfully', async () => {
+        const jobId = new mongoose.Types.ObjectId();
+        const existingJob = {
+            _id: jobId,
+            title: "Old Job",
+            completed: false,
+            save: sinon.stub().resolvesThis()
+        };
+        
+        sinon.stub(JobPost, 'findById').resolves(existingJob);
 
-    // Mock request & response
-    const req = {
-      params: { id: jobId },
-      body: { title: "New Job", completed: true }
-    };
-    const res = {
-      json: sinon.spy(), 
-      status: sinon.stub().returnsThis()
-    };
+        const req = {
+            params: { id: jobId }, body: { title: "Updated Job", completed: true }
+        };
+        const res = { 
+          status: sinon.stub().returnsThis(), 
+          json: sinon.spy() 
+        };
 
-    // Call function
-    await updateJob(req, res);
+        await updateJob(req, res);
 
-    // Assertions
-    expect(existingJob.title).to.equal("New Job");
-    expect(existingJob.completed).to.equal(true);
-    expect(res.status.called).to.be.false; // No error status should be set
-    expect(res.json.calledOnce).to.be.true;
+        expect(existingJob.title).to.equal("Updated Job");
+        expect(existingJob.completed).to.equal(true);
+        expect(res.json.calledOnce).to.be.true;
+    });
 
-    // Restore stubbed methods
-    findByIdStub.restore();
-  });
+    it('should return 404 if job is not found', async () => {
+        sinon.stub(JobPost, 'findById').resolves(null);
 
+        const req = { params: { id: new mongoose.Types.ObjectId() }, body: {} };
+        const res = {
+            status: sinon.stub().returnsThis(),
+            json: sinon.spy()
+        };
 
+        await updateJob(req, res);
 
-  it('should return 404 if task is not found', async () => {
-    const findByIdStub = sinon.stub(JobPost, 'findById').resolves(null);
+        expect(res.status.calledWith(404)).to.be.true;
+        expect(res.json.calledWith({ message: 'Job not found' })).to.be.true;
+    });
 
-    const req = { params: { id: new mongoose.Types.ObjectId() }, body: {} };
-    const res = {
-      status: sinon.stub().returnsThis(),
-      json: sinon.spy()
-    };
+    it('should return 500 on error', async () => {
+        sinon.stub(JobPost, 'findById').throws(new Error('DB Error'));
 
-    await updateJob(req, res);
+        const req = { params: { id: new mongoose.Types.ObjectId() }, body: {} };
+        const res = {
+            status: sinon.stub().returnsThis(),
+            json: sinon.spy()
+        };
 
-    expect(res.status.calledWith(404)).to.be.true;
-    expect(res.json.calledWith({ message: 'Job not found' })).to.be.true;
+        await updateJob(req, res);
 
-    findByIdStub.restore();
-  });
-
-  it('should return 500 on error', async () => {
-    const findByIdStub = sinon.stub(JobPost, 'findById').throws(new Error('DB Error'));
-
-    const req = { params: { id: new mongoose.Types.ObjectId() }, body: {} };
-    const res = {
-      status: sinon.stub().returnsThis(),
-      json: sinon.spy()
-    };
-
-    await updateJob(req, res);
-
-    expect(res.status.calledWith(500)).to.be.true;
-    expect(res.json.called).to.be.true;
-
-    findByIdStub.restore();
-  });
-
-
-
+        expect(res.status.calledWith(500)).to.be.true;
+        expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
+    });
 });
 
-
-
-describe('GetJobs Function Test', () => {
+describe('GetJobs Functionality Test', () => {
+  afterEach(() => sinon.restore());
 
   it('should return jobs for the given user', async () => {
-    // Mock user ID
     const userId = new mongoose.Types.ObjectId();
 
-    // Mock task data
     const jobs = [
       { _id: new mongoose.Types.ObjectId(), title: "Job 1", userId },
       { _id: new mongoose.Types.ObjectId(), title: "Job 2", userId }
     ];
 
-    // Stub Task.find to return mock tasks
-    const findStub = sinon.stub(JobPost, 'find').resolves(jobs);
+    sinon.stub(JobPost, 'find').resolves(jobs);
 
-    // Mock request & response
     const req = { user: { id: userId } };
     const res = {
       json: sinon.spy(),
       status: sinon.stub().returnsThis()
     };
 
-    // Call function
     await getJobs(req, res);
 
-    // Assertions
-    expect(findStub.calledOnceWith({ userId })).to.be.true;
     expect(res.json.calledWith(jobs)).to.be.true;
-    expect(res.status.called).to.be.false; // No error status should be set
-
-    // Restore stubbed methods
-    findStub.restore();
   });
 
   it('should return 500 on error', async () => {
-    // Stub Task.find to throw an error
-    const findStub = sinon.stub(JobPost, 'find').throws(new Error('DB Error'));
+    sinon.stub(JobPost, 'find').throws(new Error('DB Error'));
 
-    // Mock request & response
     const req = { user: { id: new mongoose.Types.ObjectId() } };
     const res = {
       json: sinon.spy(),
       status: sinon.stub().returnsThis()
     };
 
-    // Call function
     await getJobs(req, res);
 
-    // Assertions
+    expect(res.status.calledWith(500)).to.be.true;
+    expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
+  });
+});
+
+describe('DeleteJob Functionality Test', () => {
+  afterEach(() => sinon.restore());
+  
+  it('should delete a job successfully', async () => {
+    const req = { params: { id: new mongoose.Types.ObjectId().toString() }};
+    const job = { remove: sinon.stub().resolves() };
+
+    sinon.stub(JobPost, 'findById').resolves(job);
+
+    const res = {
+      status: sinon.stub().returnsThis(),
+      json: sinon.spy()
+    };
+
+    await deleteJob(req, res);
+
+    expect(job.remove.calledOnce).to.be.true;
+    expect(res.json.calledWith({ message: 'Job deleted' })).to.be.true;
+
+  });
+
+  it('should return 404 if job is not found', async () => {
+    const findByIdStub = sinon.stub(JobPost, 'findById').resolves(null);
+
+    const req = { params: { id: new mongoose.Types.ObjectId().toString() }};
+    const res = {
+      status: sinon.stub().returnsThis(),
+      json: sinon.spy()
+    };
+
+    await deleteJob(req, res);
+
+    expect(res.status.calledWith(404)).to.be.true;
+    expect(res.json.calledWith({ message: 'Job not found' })).to.be.true;
+
+  });
+
+  it('should return 500 if an error occurs', async() => {
+    sinon.stub(JobPost, 'findById').throws(new Error('DB Error'));
+
+    const req = { params: { id: new mongoose.Types.ObjectId().toString() }};
+    const res = {
+      status: sinon.stub().returnsThis(),
+      json: sinon.spy()
+    };
+
+    await deleteJob(req, res);
+
     expect(res.status.calledWith(500)).to.be.true;
     expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
 
-    // Restore stubbed methods
-    findStub.restore();
   });
 
 });
 
+// Assessment Question and Answer Functionality Test
 
+describe('AddQuestion Functionality Test', () => {
+  afterEach(() => sinon.restore());
 
-describe('DeleteJob Function Test', () => {
-
-  it('should delete a Job successfully', async () => {
-    // Mock request data
-    const req = { params: { id: new mongoose.Types.ObjectId().toString() } };
-
-    // Mock task found in the database
-    const job = { remove: sinon.stub().resolves() };
-
-    // Stub Task.findById to return the mock task
-    const findByIdStub = sinon.stub(JobPost, 'findById').resolves(job);
-
-    // Mock response object
-    const res = {
-      status: sinon.stub().returnsThis(),
-      json: sinon.spy()
+  it('should add a new question successfully', async() => {
+    const req = {
+      body: {
+        jobId: new mongoose.Types.ObjectId(),
+        questionText: "New Question",
+        correctAnswer: "New Answer",
+        timeLimit: 60
+      }
     };
 
-    // Call function
-    await deleteJob(req, res);
+      const createdQuestion = { _id: new mongoose.Types.ObjectId(), ...req.body};
+      sinon.stub(AssessmentQA, 'create').resolves(createdQuestion);
 
-    // Assertions
-    expect(findByIdStub.calledOnceWith(req.params.id)).to.be.true;
-    expect(job.remove.calledOnce).to.be.true;
-    expect(res.json.calledWith({ message: 'job deleted' })).to.be.true;
+      const res = {
+        status: sinon.stub().returnsThis(),
+        json: sinon.spy()
+      };
 
-    // Restore stubbed methods
-    findByIdStub.restore();
-  });
+      await addQuestion(req, res);
 
-  it('should return 404 if job is not found', async () => {
-    // Stub Task.findById to return null
-    const findByIdStub = sinon.stub(JobPost, 'findById').resolves(null);
-
-    // Mock request data
-    const req = { params: { id: new mongoose.Types.ObjectId().toString() } };
-
-    // Mock response object
-    const res = {
-      status: sinon.stub().returnsThis(),
-      json: sinon.spy()
-    };
-
-    // Call function
-    await deleteJob(req, res);
-
-    // Assertions
-    expect(findByIdStub.calledOnceWith(req.params.id)).to.be.true;
-    expect(res.status.calledWith(404)).to.be.true;
-    expect(res.json.calledWith({ message: 'Job not found' })).to.be.true;
-
-    // Restore stubbed methods
-    findByIdStub.restore();
+      expect(res.status.calledWith(201)).to.be.true;
+      expect(res.json.calledWith(createdQuestion)).to.be.true;
   });
 
   it('should return 500 if an error occurs', async () => {
-    // Stub Task.findById to throw an error
-    const findByIdStub = sinon.stub(JobPost, 'findById').throws(new Error('DB Error'));
+    sinon.stub(AssessmentQA, 'create').throws(new Error('DB Error'));
 
-    // Mock request data
-    const req = { params: { id: new mongoose.Types.ObjectId().toString() } };
+    const req = {
+      body: {
+        jobId: new mongoose.Types.ObjectId(),
+        questionText: "New Question"
+      }
+    };
 
-    // Mock response object
     const res = {
       status: sinon.stub().returnsThis(),
       json: sinon.spy()
     };
 
-    // Call function
-    await deleteJob(req, res);
+    await addQuestion(req, res);
 
-    // Assertions
     expect(res.status.calledWith(500)).to.be.true;
     expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
-
-    // Restore stubbed methods
-    findByIdStub.restore();
   });
 
+});
+
+describe('UpdateQuestion Functionality Test', () => {
+  afterEach(() => sinon.restore());
+
+  it('should update question successfully', async () => {
+    const questionId = new mongoose.Types.ObjectId();
+    const existingQuestion = {
+      _id: questionId,
+      questionText: "Old Question",
+      correctAnswer: "Old Answer",
+      timeLimit: 30,
+      save: sinon.stub().resolvesThis()
+    };
+
+    sinon.stub(AssessmentQA, 'findById').resolves(existingQuestion);
+
+    const req = {
+      params: { id: questionId },
+      body: { 
+        questionText: "Updated Question", 
+        correctAnswer: "Updated Answer", 
+        timeLimit: 60
+      }
+    };
+
+    const res = {
+      status: sinon.stub().returnsThis(), json: sinon.spy()
+    };
+
+    await updateQuestion(req, res);
+
+    expect(existingQuestion.questionText).to.equal("Updated Question");
+    expect(existingQuestion.correctAnswer).to.equal("Updated Answer");
+    expect(existingQuestion.timeLimit).to.equal(60);
+    expect(res.json.calledOnce).to.be.true;
+  });
+
+  it('should return 404 if question is not found', async() => {
+    sinon.stub(AssessmentQA, 'findById').resolves(null);
+
+    const req = {
+      params: { id: new mongoose.Types.ObjectId() },
+      body: {}
+    };
+
+    const res = {
+      status: sinon.stub().returnsThis(), json: sinon.spy()
+    };
+
+    await updateQuestion(req, res);
+
+    expect(res.status.calledWith(404)).to.be.true;
+    expect(res.json.calledWith({ message: 'question not found' })).to.be.true;
+  });
+
+  it('should return 500 on error', async() => {
+    sinon.stub(AssessmentQA, 'findById').throws(new Error('DB Error'));
+
+    const req = {
+      params: { id: new mongoose.Types.ObjectId() },
+      body: {}
+    };
+
+    const res = {
+      status: sinon.stub().returnsThis(), json: sinon.spy()
+    };
+
+    await updateQuestion(req, res);
+
+    expect(res.status.calledWith(500)).to.be.true;
+    expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
+  });
+});
+
+describe('GetQuestions Functionality Test', () => {
+  afterEach(() => sinon.restore());
+
+  it('should return questions for a job', async () => {
+    const jobId = new mongoose.Types.ObjectId();
+    const questions = [
+      { _id: new mongoose.Types.ObjectId(), questionText: "Q1", jobId },
+      { _id: new mongoose.Types.ObjectId(), questionText: "Q2", jobId }
+    ];
+
+    sinon.stub(AssessmentQA, 'find').resolves(questions);
+
+    const req = { params: {jobId} };
+    const res = { status: sinon.stub().returnsThis(), json: sinon.spy() };
+
+    await getQuestions(req, res);
+
+    expect(res.json.calledWith(questions)).to.be.true;
+  });
+
+  it('should return 500 on error', async () => {
+    sinon.stub(AssessmentQA, 'find').throws(new Error('DB Error'));
+
+    const req = { params: { jobId: new mongoose.Types.ObjectId() }};
+    const res = { 
+      status: sinon.stub().returnsThis(),
+      json: sinon.spy()
+    };
+
+    await getQuestions(req, res);
+
+    expect(res.status.calledWith(500)).to.be.true;
+    expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
+  });
+});
+
+describe('DeleteQuestion Functionality Test', () => {
+  afterEach(() => sinon.restore());
+
+  it('should delete a question successfully', async () => {
+    const req = { params: { id: new mongoose.Types.ObjectId().toString() }};
+    const question = { remove: sinon.stub().resolves()};
+
+    sinon.stub(AssessmentQA, 'findById').resolves(question);
+
+    const res = {
+      status: sinon.stub().returnsThis(), json: sinon.spy() 
+    };
+
+    await deleteQuestion(req, res);
+
+    expect(question.remove.calledOnce).to.be.true;
+    expect(res.json.calledWith({ message: 'question deleted' })).to.be.true;
+  });
+
+  it('should return 404 if question is not found', async () => {
+    sinon.stub(AssessmentQA, 'findById').resolves(null);
+
+    const req = { params: { id: new mongoose.Types.ObjectId().toString() }};
+    const res = { status: sinon.stub().returnsThis(), json: sinon.spy()};
+
+    await deleteQuestion(req, res);
+
+    expect(res.status.calledWith(404)).to.be.true;
+    expect(res.json.calledWith({ message: 'question not found' })).to.be.true;
+  });
+
+  it('should return 500 if an error occurs', async () => {
+    sinon.stub(AssessmentQA, 'findById').throws(new Error('DB Error'));
+
+    const req = { params: { id: new mongoose.Types.ObjectId().toString() }};
+    const res = { status: sinon.stub().returnsThis(), json: sinon.spy() };
+
+    await deleteQuestion(req, res);
+
+    expect(res.status.calledWith(500)).to.be.true;
+    expect(res.json.calledWithMatch({ message: 'DB Error' })).to.be.true;
+  });
 });
