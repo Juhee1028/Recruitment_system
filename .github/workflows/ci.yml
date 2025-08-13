@@ -40,11 +40,9 @@ jobs:
         echo "Secret 2 is: $JWT_SECRET"
         echo "Secret 3 is: $PORT"
       
-      # there were no PM2 processes running in my enviornment --> git clone my repository on ubuntu in putty 
+      # there were no PM2 processes running in my enviornment --> git clone my repository on ubuntu in putty because I can't find my project file in home/utuntu
     - name: Stop PM2 processes 
       run: pm2 stop all
-
-
 
     # Install dependencies for backend
     - name: Install Backend Dependencies
