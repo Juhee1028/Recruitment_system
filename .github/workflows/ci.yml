@@ -22,6 +22,7 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v3
 
+      
     # Set up Node.js
     - name: Setup Node.js
       uses: actions/setup-node@v3
@@ -40,6 +41,7 @@ jobs:
         echo "Secret 3 is: $PORT"
       
     - run: pm2 stop all
+
 
     # Install dependencies for backend
     - name: Install Backend Dependencies
@@ -78,6 +80,3 @@ jobs:
     - run: pm2 start all
 
     - run: pm2 restart all
-
-
-    
