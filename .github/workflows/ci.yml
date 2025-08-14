@@ -22,7 +22,6 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v3
 
-
     # Set up Node.js
     - name: Setup Node.js
       uses: actions/setup-node@v3
@@ -40,9 +39,7 @@ jobs:
         echo "Secret 2 is: $JWT_SECRET"
         echo "Secret 3 is: $PORT"
       
-      # there were no PM2 processes running in my enviornment --> git clone my repository on ubuntu in putty because I can't find my project file in home/utuntu
-    - name: Stop PM2 processes 
-      run: pm2 stop all || true
+    - run: pm2 stop all
 
     # Install dependencies for backend
     - name: Install Backend Dependencies
@@ -78,6 +75,6 @@ jobs:
         touch .env
         echo "${{ secrets.PROD }}" > .env
 
-    - run: pm2 start all || true
+    - run: pm2 start all
 
-    - run: pm2 restart all || true
+    - run: pm2 restart all
