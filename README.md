@@ -22,12 +22,12 @@
     npm install
     > Note: .env file is already configured, so you do not need to create it manually.
 
-    # backend with PM2 for running
+    ### backend with PM2 for running
     pm2 start "npm run start" --name="backend"
     pm2 status
     pm2 save
 
-    # Run backend tests
+    #### Run backend tests
     npm run test
     > This will run the automated backend tests to verify functionality of the job posting and assessment Q&As.
 
