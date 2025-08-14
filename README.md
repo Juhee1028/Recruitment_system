@@ -1,3 +1,61 @@
+# Online Recruitment and Assessment System Project
+
+## Project Feature
+- Job Post CRUD (Create, Read, Update, Delete)
+- Questions and Answers CRUD for assessment system
+
+## Prerequisites
+- Node.js
+- Git
+- VS code editor
+- MongoDB
+- GitHub
+- PM2
+
+## Project Setup Instruction
+1. Clone the Repository
+    git clone https://github.com/Juhee1028/Recruitment_system.git
+    cd Recruitment_system
+
+2. Backend Setup
+    cd backend
+    npm install
+    > Note: .env file is already configured, so you do not need to create it manually.
+
+    # backend with PM2 for running
+    pm2 start "npm run start" --name="backend"
+    pm2 status
+    pm2 save
+
+    # Run backend tests
+    npm run test
+    > This will run the automated backend tests to verify functionality of the job posting and assessment Q&As.
+
+3. Frontend Setup
+    cd ../frontend
+    yarn install
+    sudo rm -rf ./build
+    yarn run build
+    pm2 serve build/ 3000 --name "Frontend" --spa
+    pm2 status
+    pm2 save
+
+## JIRA Board
+- URL: https://miline1028.atlassian.net/jira/software/projects/RS/summary?atlOrigin=eyJpIjoiZjE4ZTkzZmFhOTZmNGI1Yzg3MDI3ZGVmOWU2YzcyMTMiLCJwIjoiaiJ9
+
+## GitHub Repository
+- URL: https://github.com/Juhee1028/Recruitment_system.git
+
+## Public URL of my project
+- URL: http://54.252.49.30
+
+## Username & password
+- ID: user1@gmail.com
+- Password: user1
+
+
+
+# Assignment Detail
 
 **Assessment 1 (Total Marks **20**)**
 
